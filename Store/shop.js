@@ -11,5 +11,6 @@ const productgrid = document.getElementById(products)
 const searchbar = document.getElementById(search)
 const categoryselect = document.getElementById(category)
 
-
-console.log(products)
+function displayproducts({name, category}) {
+    
+}
