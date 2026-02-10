@@ -1,0 +1,8 @@
+.product {
+    display: flex; 
+    border: 1px solid black;
+}
+.productgrid {
+    display: flex;
+    flex-wrap: wrap;
+}
