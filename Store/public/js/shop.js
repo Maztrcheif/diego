@@ -1,19 +1,29 @@
+async function fetchProducts() {
+    try {
+        const response = await fetch('api/get_products.php')
+        const products = await response.json()
+        return products
+    } catch (error) {
+        console.error('Error fetching products', error)
+        return []
+        
+    }
+    
+}
 
-const products = [
-    {id: 1, name: "Banana", category:"produce", price: 1.99},
-    {id: 2, name: "Apple", category:"produce", price: 1.49},
-    {id: 3, name: "Concha", category: "bakery", price: .99},
-    {id: 4, name: "Donut", category: "bakery", price: .99},
-    {id: 5, name: "Beef", category: "meat", price: 5.99},
-    {id: 6, name: "Chicken", category: "meat", price: 4.99},
-    {id: 7, name: "Rice", category: "grocery", price: 2.99}
-]
 const productgrid = document.getElementById("products")
 const searchbar = document.getElementById("search")
 const categoryselect = document.getElementById("category")
 
+fetchProducts().then(products => {
+    renderproducts(products)
+    searchbar.addEventListener("input", () => filterProducts(products))
+    categoryselect.addEventListener("change", () => filterProducts(products))
+})
 
-const renderproducts = (items) => {
+
+
+function renderproducts(items) {
     productgrid.innerHTML = ""
     items.forEach(product => {
         const div = document.createElement("div")
@@ -34,12 +44,12 @@ const renderproducts = (items) => {
 }
 
 
- renderproducts(products)
+ 
 
- const filterProducts = () => {
+ function filterProducts(products) {
     const searchTerm = searchbar.value.toLowerCase()
     const category = categoryselect.value
-    const filtered = products.filter (product => {
+    const filtered = products.filter(product => {
         const sameName = product.name.toLowerCase().includes(searchTerm)
         const sameCategory = category === "all" ? true : product.category === category
         return sameName && sameCategory
@@ -47,8 +57,7 @@ const renderproducts = (items) => {
  renderproducts(filtered)
  }
  
- searchbar.addEventListener("input", filterProducts)
- categoryselect.addEventListener("change", filterProducts)
+ 
  productgrid.addEventListener("click", (event) => {
     const button = event.target.closest(".buy")
     if (!button) return
