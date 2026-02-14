@@ -1,3 +1,4 @@
+
 const products = [
     {id: 1, name: "Banana", category:"produce", price: 1.99},
     {id: 2, name: "Apple", category:"produce", price: 1.49},
@@ -31,6 +32,8 @@ const renderproducts = (items) => {
     });
 
 }
+
+
  renderproducts(products)
 
  const filterProducts = () => {
@@ -46,4 +49,12 @@ const renderproducts = (items) => {
  
  searchbar.addEventListener("input", filterProducts)
  categoryselect.addEventListener("change", filterProducts)
- productgrid.addEventListener()
+ productgrid.addEventListener("click", (event) => {
+    const button = event.target.closest(".buy")
+    if (!button) return
+    const product = button.closest(".product")
+    const name = product.querySelector("h3").textContent
+    console.log("added to cart", name)
+ })
+
+ 

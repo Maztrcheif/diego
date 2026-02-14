@@ -33,8 +33,11 @@
     </select>
 </div>
 <div id="products" class="productgrid"></div>
+<footer>
+        <a href="contact.php">Contact us!</a>
+    </footer>
 </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/shop.js"></script>
+    <script src="js/shop.js"></script>
 </body>
 </html>
