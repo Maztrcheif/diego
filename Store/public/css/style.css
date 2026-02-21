@@ -7,7 +7,14 @@
     flex-wrap: wrap;
 }
 .login {
-   position: absolute;
+   display: flexbox;
+    position: absolute;
    top: 40%;
-   left: 45%; 
+   left: 45%;
+   border: 1px solid black
+}
+.CA {
+
+    position: relative;
+    left: 21px;
 }
