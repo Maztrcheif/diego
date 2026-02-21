@@ -16,7 +16,7 @@
                 <a class="nav-link" href="index.php">Home</a>
                 <a class="nav-link" href="shop.php">Shop</a>
                 <a class="nav-link" href="cart.html">Cart</a>
-                <a class="nav-link" href="apply.html">Apply</a>
+                <a class="nav-link" href="apply.php">Apply</a>
                 <a class="nav-link" href="login.html">Login</a>
                 </div>
             </nav>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 header('Content-Type: application/json');
 
 $host = 'database';
@@ -22,24 +22,3 @@ try {
     exit;
 };
 
-$stmt = $pdo->query("SELECT id, name, category, price FROM products");
-$products = $stmt->fetchAll();
-foreach ($products as &$p) {
-    $p['price'] = floatval($p['price']);
-}
-echo json_encode($products);
-
-$method = $_SERVER('REQUEST_METHOD');
-
-if ($method === 'GET') {
-
-}
-if ($method === 'POST') {
-    
-}
-if ($method === 'PUT') {
-    
-}
-if ($method === 'DELETE') {
-    
-}

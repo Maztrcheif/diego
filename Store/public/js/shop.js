@@ -51,7 +51,11 @@ function renderproducts(items) {
     const category = categoryselect.value
     const filtered = products.filter(product => {
         const sameName = product.name.toLowerCase().includes(searchTerm)
-        const sameCategory = category === "all" ? true : product.category === category
+        let sameCategory = product.category == category
+        if (category == "all") {
+             sameCategory = true
+        }
+ //           const sameCategory = category === "all" ? true : product.category === category
         return sameName && sameCategory
  })
  renderproducts(filtered)

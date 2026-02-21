@@ -6,3 +6,8 @@
     display: flex;
     flex-wrap: wrap;
 }
+.login {
+   position: absolute;
+   top: 40%;
+   left: 45%; 
+}

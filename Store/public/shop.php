@@ -14,8 +14,8 @@
                 <a href="index.php">Home</a>
                 <a href="shop.php">Shop</a>
                 <a href="cart.html">Cart</a>
-                <a href="apply.html">Apply</a>
-                <a href="login.html">Login</a>
+                <a href="apply.php">Apply</a>
+                <a href="login.php">Login</a>
             </nav>
     </header>
 <main>
