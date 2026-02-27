@@ -18,3 +18,31 @@
     position: relative;
     left: 21px;
 }
+.searchBar {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    border: 5px solid black;
+    padding: 5px;
+}
+.window {
+    display: flexbox;
+    flex-wrap: nowrap;
+    justify-content: center;
+    
+}
+.addbtn {
+    position: relative;
+    right: 50%;
+    left: 50%;
+    
+
+}
+.productdisplay {
+    position: relative;
+    right: 50%;
+    left: 50%;
+    border: 5px solid black;
+    padding: 5px;
+    justify-content: center;
+}

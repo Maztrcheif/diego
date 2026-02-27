@@ -19,13 +19,12 @@
             </nav>
     </header>
     <main>
-        <div class="login">
-            <div><input type="text" placeholder="Username" id="username"></div>
-            <div><input type="text" placeholder="Password" id="password"></div>
-            <div><button id="login">Login</button>
-                 <button id="create" class="CA">Create Account</button>     
-        </div>
-        </div>
+        <div class="login"><form action="login.php" method="post">
+            <div><input type="text" placeholder="Username" id="username" name="username"></div>
+            <div><input type="password" placeholder="Password" id="password" name="password"></div>
+            <div><button type="submit" id="login">Login</button>
+                 <button id="create" class="CA">Create Account</button></div>
+    </form></div>
     </main>
     <script src="js/login.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
