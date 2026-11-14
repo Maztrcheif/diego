@@ -2,12 +2,34 @@ import random
 import time
 import threading
 import curses
+class Game:
+    def __init__(self):
+        self.main_phase = "Day"
+        self.sub_phase = "Start"
+        self.players = []
+        self.messages = []
+        self.day_Count = 0
+        self.timer = 0
+        self.phase_timer = 15
+        self.elapsed = 0
+        self.time_start = 0
+        self.game_State = "Game"
+        self.player_on_stand = False
+        self.Judgement_voting = False
+        self.player_voting = False
+        self.day_abilities = False
+        self.night_abilities = False
+        self.dead_player = False
+        self.vote_counter = 0
+        self.verdict = None
+        self.input = ""
 class Player: 
     def __init__(self, player_id, name) :
         self.name = name
         self.id = player_id
         self.alive = True
         self.role = None
+        self.effects = []
 class Messages:
     def __init__(self, content, sender_name, sender_id,) :
         self.content = content
@@ -15,65 +37,86 @@ class Messages:
         self.sender_id = sender_id
         self.time_sent = None
         self.message_id = None
-def UI(stdscr) :
+def draw_screen_game(stdscr,game):
     stdscr.clear()
-    stdscr.addstr(8,0, "Fake Mafia")
-    stdscr.addstr(7,0, str(timer))
+    stdscr.addstr(0,0, f"Time left:{game.timer}")
+    stdscr.addstr(1,0, f"{game.main_phase} {game.day_Count}")
+    stdscr.addstr(2,0, f"{game.sub_phase}")
+    stdscr.addstr(3,0, f"{game.messages}")
+    stdscr.addstr(10,0,game.input)
+    time.sleep(0.05)
     stdscr.refresh()
-
-
-
-
-
-
-def start_timer(index):
-    timer = phase_timers[phases[index]]
-    while timer > 0 :
-        print(f"Timer:{timer}", end="\r", flush=True)
-        time.sleep(1)
-        timer = timer - 1
-#def start_Game()
-
-def change_Phase(phase):
-    if phase == 0:
-        phase = 7
-        return(phase)
-    phase = phase + 1
-    if phase == 8:
-        phase = 1
-    return(phase)
-def start_phase(day_Count, phase_Index) :
-    if phase_Index == 0 or phase_Index == 1 :
-        content = f"Day {day_Count}"
-    elif phase_Index == 2:
-        content= "the town may begin voting"
-    elif phase_Index == 3:
-        content = f"(playeronstand), what is ur defense"
-    elif phase_Index == 4 :
-        content ="the town may now vote on the fate of (playeronstand)"
-    elif phase_Index == 5:
-        content = "(playeronstand) do you have any last words?"
-    elif phase_Index == 6 :
-        content = "it is too late to continue voting"
-    elif phase_Index == 7:
-        day_Count = day_Count + 1
-        content = f"Night {day_Count}"
-    message_id = sendmsg(content,"SYSTEM", None, day_Count)
-    return(day_Count)
-def sendmsg(content, sender_name, sender_id, day_Count):
-    message_id = len(messages)
-    if sender_name == "SYSTEM" :
-        new_message = Messages(content, sender_name, None,)
-        messages.append(new_message)
-        print(messages[message_id].content)
-        return()
-    #else :
-    new_message = Messages(content, sender_name, sender_id)
-    messages.append(new_message)
-    print(f"{messages[message_id].sender_id} {messages[message_id].sender_name}: {messages[message_id].content}")
-    return()
-
-players = []
+def get_input(stdscr,game):
+    key = stdscr.getch()
+    if 32 <= key <= 126:
+        game.input += chr(key)
+    elif key == curses.KEY_BACKSPACE or key == 127:
+        game.input = game.input[:-1]
+    elif key == 10:
+        message = game.input
+        game.input = ""
+        game.messages.append(message)
+def start_timer(game):
+    game.time_start = time.monotonic()
+    game.elapsed = 0
+def phase_timer(game):
+    game.elapsed = time.monotonic() - game.time_start
+    game.timer = max(0,game.phase_timer - int(game.elapsed))
+#def day_phase(game):
+#def night_phase(game):
+def change_main_phase(game):
+    if game.main_phase == "Day":
+        game.phase_timer = 60
+        game.main_phase = "Night"
+        game.day_Count = game.day_Count + 1
+        game.night_abilities = True
+        game.day_abilities = False
+    elif game.main_phase == "Night":
+        game.main_phase = "Day"
+        game.night_abilities = False
+        game.day_abilities = True
+        if game.dead_player == True :
+            game.sub_phase = "The_dead"
+        else: 
+            game.phase_timer = 60
+            game.sub_phase = "Discussion"
+def change_sub_phase(game):
+    if game.sub_phase == "Discussion":
+        game.phase_timer = 30
+        game.sub_phase = "Voting"
+        game.player_voting = True
+    elif game.sub_phase == "The_dead":
+        game.phase_timer = 60
+        game.sub_phase = "Discussion"
+    elif game.sub_phase == "Voting":
+        game.player_voting = False
+        if game.player_on_stand == True:
+            game.sub_phase = "Defense"
+            game.phase_timer = 10
+        else:
+            game.sub_phase = "End_of_day"
+    elif game.sub_phase == "Defense":
+        game.phase_timer = 20
+        game.sub_phase = "Judgement"
+        game.Judgement_voting = True
+    elif game.sub_phase == "Judgement":
+        game.Judgement_voting = False
+        if game.verdict == "Guilty":
+            game.sub_phase = "Last_words"
+            game.phase_timer = 5
+            game.vote_counter = 0
+        elif game.verdict == "Innocent":
+            game.vote_counter = game.vote_counter + 1
+            if game.vote_counter == 3:
+                game.sub_phase = "End_of_day"
+                game.vote_counter = 0
+            else:
+                game.sub_phase = "Voting"
+                game.phase_timer = 10
+                game.player_on_stand = False
+    elif game.sub_phase == "Last_words":
+        game.sub_phase = "End_of_day"
+        game.player_on_stand = False
 test_names = [
     "Alex",
     "Benjamin",
@@ -91,65 +134,36 @@ test_names = [
     "Nathan",
     "Olivia"
 ]
-phase_timers = {
-    "start": 15,
-    "day": 60,
-    "vote": 30,
-    "trial": 2,
-    "judge": 2,
-    "final_words": 2,
-    "end_day": 2,
-    "night": 2
-}
-phases = [
-    "start",
-    "day",
-    "vote",
-    "trial",
-    "judge",
-    "final_words",
-    "end_day",
-    "night"
-]
-print("Welcome to Termial Town!")
-name = input("Please Input Your Name:")
-new_Player = Player(1,name)
-players.append(new_Player)
-random.shuffle(test_names)
-for x in range(1,4):
-    new_Player = Player(x + 1,test_names[x])
-    players.append(new_Player)
-Roles = ["Mafia", "Townie", "Doctor","Townie"]
-random.shuffle(Roles)
-for x in range(len(players)) :
-    players[x].role = Roles[x]
-    #print(f"{players[x].name} - {players[x].role}")
-print("Starting Game...")
-messages = []
-message_id = -1
-#start_Game()
-phase_Index = 0
-day_Count = 0
-timer = 0
-thread = threading.Thread(target=start_timer,args=(phase_Index,))
-thread.start()
-while True :
-    curses.wrapper(UI)
-    if timer == 0 :
-        day_Count = start_phase(day_Count, phase_Index)
-    #start_timer(phase_Index)
-    
-        phase_Index = change_Phase(phase_Index)
-   # while True:
-    #if timer != 0:
 
-    sendmsg(input(),players[0].name,players[0].id,day_Count)
-#print (f"is {player1.name} correct?")
-#print("[1] YES")
-#print("[2] NO")
-#name_Confirm = input()
-#if name_Confirm == "1" :
- #   print("Good")
-   # print("I will now bestow upon you: a reason to live and your way of life")
-#else:
-    #player_Name = input("Please Input Your Name:")
+game = Game()
+def Main_Game(stdscr):
+    stdscr.timeout(100)
+    start_timer(game)
+    while game.game_State == "Game":
+        phase_timer(game)
+        draw_screen_game(stdscr,game)
+        get_input(stdscr,game)
+        if game.main_phase == "Day":
+            if game.day_Count == 0 :
+                game.sub_phase = "Start"
+            #day_phase(game)
+            True
+        elif game.main_phase == "Night":
+            #night_phase(game)
+            True
+        if game.timer <= 0 :
+            if game.main_phase == "Day":
+                if game.sub_phase == "Start":
+                    change_main_phase(game)
+                elif game.sub_phase == "End_of_day":
+                    change_main_phase(game)
+                else:
+                    change_sub_phase(game)
+            elif game.main_phase == "Night":
+                change_main_phase(game)
+            start_timer(game)
+        elif game.sub_phase == "Voting" and game.player_on_stand == True:
+            change_sub_phase(game)
+            start_timer(game)
+curses.wrapper(Main_Game)
+
