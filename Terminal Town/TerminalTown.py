@@ -1,16 +1,35 @@
 import random
 import time
 import threading
+import curses
 class Player: 
     def __init__(self, player_id, name) :
         self.name = name
         self.id = player_id
         self.alive = True
         self.role = None
+class Messages:
+    def __init__(self, content, sender_name, sender_id,) :
+        self.content = content
+        self.sender_name = sender_name
+        self.sender_id = sender_id
+        self.time_sent = None
+        self.message_id = None
+def UI(stdscr) :
+    stdscr.clear()
+    stdscr.addstr(8,0, "Fake Mafia")
+    stdscr.addstr(7,0, str(timer))
+    stdscr.refresh()
+
+
+
+
+
+
 def start_timer(index):
     timer = phase_timers[phases[index]]
     while timer > 0 :
-        print(f"\033[H\033[KTimer:{timer}", end="\r", flush=True)
+        print(f"Timer:{timer}", end="\r", flush=True)
         time.sleep(1)
         timer = timer - 1
 #def start_Game()
@@ -23,25 +42,36 @@ def change_Phase(phase):
     if phase == 8:
         phase = 1
     return(phase)
-def start_phase(day_Count) :
+def start_phase(day_Count, phase_Index) :
     if phase_Index == 0 or phase_Index == 1 :
-        print(f"Day {day_Count}")
+        content = f"Day {day_Count}"
     elif phase_Index == 2:
-        print("the town may begin voting")
+        content= "the town may begin voting"
     elif phase_Index == 3:
-        print(f"(playeronstand), what is ur defense")
+        content = f"(playeronstand), what is ur defense"
     elif phase_Index == 4 :
-        print("the town may now vote on the fate of (playeronstand)")
+        content ="the town may now vote on the fate of (playeronstand)"
     elif phase_Index == 5:
-        print("(playeronstand) do you have any last words?")
+        content = "(playeronstand) do you have any last words?"
     elif phase_Index == 6 :
-        print("it is too late to continue voting")
+        content = "it is too late to continue voting"
     elif phase_Index == 7:
         day_Count = day_Count + 1
-        print(f"Night {day_Count}")
+        content = f"Night {day_Count}"
+    message_id = sendmsg(content,"SYSTEM", None, day_Count)
     return(day_Count)
-def sendmsg(id):
-    print(f"\033[1;1H{players[id].id} {players[id].name}:{input()}")
+def sendmsg(content, sender_name, sender_id, day_Count):
+    message_id = len(messages)
+    if sender_name == "SYSTEM" :
+        new_message = Messages(content, sender_name, None,)
+        messages.append(new_message)
+        print(messages[message_id].content)
+        return()
+    #else :
+    new_message = Messages(content, sender_name, sender_id)
+    messages.append(new_message)
+    print(f"{messages[message_id].sender_id} {messages[message_id].sender_name}: {messages[message_id].content}")
+    return()
 
 players = []
 test_names = [
@@ -93,23 +123,27 @@ Roles = ["Mafia", "Townie", "Doctor","Townie"]
 random.shuffle(Roles)
 for x in range(len(players)) :
     players[x].role = Roles[x]
-    print(f"{players[x].name} - {players[x].role}")
+    #print(f"{players[x].name} - {players[x].role}")
 print("Starting Game...")
+messages = []
+message_id = -1
 #start_Game()
 phase_Index = 0
 day_Count = 0
 timer = 0
 thread = threading.Thread(target=start_timer,args=(phase_Index,))
-
+thread.start()
 while True :
-    day_Count = start_phase(day_Count)
+    curses.wrapper(UI)
+    if timer == 0 :
+        day_Count = start_phase(day_Count, phase_Index)
     #start_timer(phase_Index)
-    thread.start()
-    phase_Index = change_Phase(phase_Index)
-    while True :
-
+    
+        phase_Index = change_Phase(phase_Index)
+   # while True:
     #if timer != 0:
-            sendmsg(1)
+
+    sendmsg(input(),players[0].name,players[0].id,day_Count)
 #print (f"is {player1.name} correct?")
 #print("[1] YES")
 #print("[2] NO")
